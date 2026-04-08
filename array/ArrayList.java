@@ -1,10 +1,14 @@
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class ArrayList {
 
+    private static final Logger logger = Logger.getLogger(ArrayList.class.getName());
+
     // monotonic array
     public static boolean isMonotonic(int[] arr) {
+        if (arr == null || arr.length == 0) return true;
         boolean increasing = true, decreasing = true;
         for (int i = 1; i < arr.length; i++) {
             if (arr[i] > arr[i - 1])
@@ -17,6 +21,7 @@ public class ArrayList {
 
     // pair sum
     public static boolean pairSum(int[] arr, int target) {
+        if (arr == null || arr.length == 0) return false;
         int left = 0, right = arr.length - 1;
         while (left < right) {
             int sum = arr[left] + arr[right];
@@ -32,8 +37,9 @@ public class ArrayList {
 
     // pair sum 2
     public static boolean pairSum2(int[] arr, int target) {
+        if (arr == null || arr.length == 0) return false;
         int bp = -1;
-        for (int i = 0; i < arr.length; i++) {
+        for (int i = 0; i < arr.length - 1; i++) {
             if (arr[i] > arr[i + 1]) {
                 bp = i;
                 break;
@@ -57,7 +63,7 @@ public class ArrayList {
 
     //beautiful array
     public static int[] beautifulArray(int n) {
-         List<Integer> list = new java.util.ArrayList<>();
+        List<Integer> list = new java.util.ArrayList<>();
         list.add(1);
         while (list.size() < n) {
             List<Integer> temp = new java.util.ArrayList<>();
@@ -76,10 +82,9 @@ public class ArrayList {
 
 
     public static void main(String[] args) {
-       //beautiful array
-       int n = 5;
-         int[] result = beautifulArray(n);
-            System.out.println(Arrays.toString(result));
-    
-}
+        //beautiful array
+        int n = 5;
+        int[] result = beautifulArray(n);
+        logger.info(Arrays.toString(result));
+    }
 }
