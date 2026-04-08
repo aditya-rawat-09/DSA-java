@@ -1,3 +1,4 @@
+
 import java.util.*;
 
 public class ArrayList {
@@ -53,10 +54,32 @@ public class ArrayList {
         return false;
     }
 
+
+    //beautiful array
+    public static int[] beautifulArray(int n) {
+         List<Integer> list = new java.util.ArrayList<>();
+        list.add(1);
+        while (list.size() < n) {
+            List<Integer> temp = new java.util.ArrayList<>();
+            for (int i : list) {
+                if (2 * i - 1 <= n)
+                    temp.add(2 * i - 1);
+            }
+            for (int i : list) {
+                if (2 * i <= n)
+                    temp.add(2 * i);
+            }
+            list = temp;
+        }
+        return list.stream().mapToInt(i -> i).toArray();
+    }
+
+
     public static void main(String[] args) {
-       int arr[] = { 11, 15 ,1, 2, 3, 4, 5 };
-         int target = 16;
-        System.out.println(pairSum2(arr, target));
+       //beautiful array
+       int n = 5;
+         int[] result = beautifulArray(n);
+            System.out.println(Arrays.toString(result));
     
 }
 }
