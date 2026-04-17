@@ -1,27 +1,23 @@
-import java.util.logging.Logger;
-
+// Merge Sort on Linked List
+// Idea: split list into two halves → sort each half → merge them back
+// Time: O(n log n) | Space: O(log n) for recursion stack
 public class mergesort {
 
-    private static final Logger logger = Logger.getLogger(mergesort.class.getName());
-
-    static class ListNode {
-        int val;
-        ListNode next;
-        ListNode(int val) { this.val = val; }
-    }
-
-    // merge sort for linked list
+    // main function: recursively splits and sorts
     public static ListNode mergeSort(ListNode head) {
-        if (head == null || head.next == null) return head;
-        ListNode mid = getMid(head);
-        ListNode left = mergeSort(head);
-        ListNode right = mergeSort(mid);
-        return merge(left, right);
+        if (head == null || head.next == null) return head; // base case
+
+        ListNode mid = getMid(head);   // find middle and split
+        ListNode left = mergeSort(head); // sort left half
+        ListNode right = mergeSort(mid); // sort right half
+        return merge(left, right);       // merge both sorted halves
     }
 
-    public static ListNode merge(ListNode left, ListNode right) {
+    // merge two sorted linked lists into one sorted list
+    private static ListNode merge(ListNode left, ListNode right) {
         ListNode dummy = new ListNode(-1);
         ListNode curr = dummy;
+
         while (left != null && right != null) {
             if (left.val < right.val) {
                 curr.next = left;
@@ -32,22 +28,24 @@ public class mergesort {
             }
             curr = curr.next;
         }
-        curr.next = left == null ? right : left;
+
+        curr.next = (left != null) ? left : right; // attach remaining nodes
         return dummy.next;
     }
 
-    public static ListNode getMid(ListNode head) {
-        if (head == null) return null;
+    // find middle of list using fast/slow pointers, then split it
+    private static ListNode getMid(ListNode head) {
         ListNode slow = head, fast = head, prev = null;
         while (fast != null && fast.next != null) {
             prev = slow;
             slow = slow.next;
             fast = fast.next.next;
         }
-        if (prev != null) prev.next = null;
-        return slow;
+        if (prev != null) prev.next = null; // split the list into two halves
+        return slow; // slow is now the start of second half
     }
 
+    // helper to add node at end
     public static ListNode addLast(ListNode head, int val) {
         ListNode node = new ListNode(val);
         if (head == null) return node;
@@ -57,14 +55,14 @@ public class mergesort {
         return head;
     }
 
-    public static void printList(ListNode head) {
-        StringBuilder sb = new StringBuilder();
+    // helper to print list
+    public static void print(ListNode head) {
         while (head != null) {
-            sb.append(head.val);
-            if (head.next != null) sb.append(" -> ");
+            System.out.print(head.val);
+            if (head.next != null) System.out.print(" -> ");
             head = head.next;
         }
-        logger.info(sb.toString());
+        System.out.println();
     }
 
     public static void main(String[] args) {
@@ -75,8 +73,13 @@ public class mergesort {
         head = addLast(head, 1);
         head = addLast(head, 9);
         head = addLast(head, 2);
-        printList(head);
+
+        System.out.print("Before: ");
+        print(head);
+
         head = mergeSort(head);
-        printList(head);
+
+        System.out.print("After:  ");
+        print(head);
     }
 }

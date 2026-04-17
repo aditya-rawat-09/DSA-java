@@ -1,61 +1,54 @@
-import java.util.*;
+// Basic LinkedList operations
+// covers: add, delete, reverse, palindrome check, cycle detection
 public class linkedlist {
 
-    //Add first
+    // add a new node at the beginning
     public static ListNode addFirst(ListNode head, int val) {
-        ListNode newNode = new ListNode(val);
-        newNode.next = head;
-        return newNode;
+        ListNode node = new ListNode(val);
+        node.next = head;
+        return node;
     }
 
-    //Add last
-    public static ListNode addLast(ListNode head, int val) {    
-        ListNode newNode = new ListNode(val);
-        if (head == null) return newNode;
+    // add a new node at the end
+    public static ListNode addLast(ListNode head, int val) {
+        ListNode node = new ListNode(val);
+        if (head == null) return node;
         ListNode curr = head;
-        while (curr.next != null) {
-            curr = curr.next;
-        }
-        curr.next = newNode;
+        while (curr.next != null) curr = curr.next;
+        curr.next = node;
         return head;
     }
 
-    // Add at index
+    // add a new node at a given index
     public static ListNode addAtIndex(ListNode head, int index, int val) {
-        if (index < 0) return head;
         if (index == 0) return addFirst(head, val);
-        ListNode newNode = new ListNode(val);
+        ListNode node = new ListNode(val);
         ListNode curr = head;
         for (int i = 0; i < index - 1; i++) {
             if (curr == null) return head;
             curr = curr.next;
         }
         if (curr == null) return head;
-        newNode.next = curr.next;
-        curr.next = newNode;
+        node.next = curr.next;
+        curr.next = node;
         return head;
     }
 
-
-    // delete at index
+    // delete node at a given index
     public static ListNode deleteAtIndex(ListNode head, int index) {
-        if (index < 0 || head == null) return head;
+        if (head == null || index < 0) return head;
         if (index == 0) return head.next;
         ListNode curr = head;
         for (int i = 0; i < index - 1; i++) {
             if (curr.next == null) return head;
             curr = curr.next;
         }
-        if (curr.next == null) return head;
-        curr.next = curr.next.next;
+        if (curr.next != null) curr.next = curr.next.next;
         return head;
     }
 
-
-
-    // reverse linked list
-    public static ListNode reverseList(ListNode head) {
-        if (head == null) return null;
+    // reverse the entire linked list
+    public static ListNode reverse(ListNode head) {
         ListNode prev = null, curr = head;
         while (curr != null) {
             ListNode next = curr.next;
@@ -64,80 +57,79 @@ public class linkedlist {
             curr = next;
         }
         return prev;
-    } 
+    }
 
-//check palindrome
+    // check if linked list is a palindrome
+    // idea: find middle → reverse second half → compare both halves
     public static boolean isPalindrome(ListNode head) {
         if (head == null) return true;
         ListNode slow = head, fast = head;
+
+        // find middle using fast/slow pointers
         while (fast != null && fast.next != null) {
             slow = slow.next;
             fast = fast.next.next;
         }
-        ListNode secondHalf = reverseList(slow);
-        ListNode firstHalf = head;
+
+        ListNode secondHalf = reverse(slow); // reverse second half
+        ListNode first = head;
+
         while (secondHalf != null) {
-            if (firstHalf.val != secondHalf.val)
-                return false;
-            firstHalf = firstHalf.next;
+            if (first.val != secondHalf.val) return false;
+            first = first.next;
             secondHalf = secondHalf.next;
         }
         return true;
     }
 
-
-    //loop detection
+    // detect if linked list has a cycle (loop)
     public static boolean hasCycle(ListNode head) {
-        if (head == null) return false;
         ListNode slow = head, fast = head;
         while (fast != null && fast.next != null) {
             slow = slow.next;
             fast = fast.next.next;
-            if (slow == fast)
-                return true;
+            if (slow == fast) return true; // they met → cycle exists
         }
         return false;
     }
 
-    //remove of loop
+    // remove the cycle from linked list if it exists
     public static ListNode removeCycle(ListNode head) {
-        if (head == null) return null;
         ListNode slow = head, fast = head;
         boolean hasCycle = false;
+
         while (fast != null && fast.next != null) {
             slow = slow.next;
             fast = fast.next.next;
-            if (slow == fast) {
-                hasCycle = true;
-                break;
-            }
+            if (slow == fast) { hasCycle = true; break; }
         }
+
         if (!hasCycle) return head;
 
+        // find start of cycle
         slow = head;
         while (slow != fast) {
             slow = slow.next;
             fast = fast.next;
         }
-        ListNode cycleStart = slow;
 
-        ListNode prev = null, curr = cycleStart;
+        // find the last node in cycle and break it
+        ListNode prev = null, curr = slow;
         do {
             prev = curr;
             curr = curr.next;
-        } while (curr != cycleStart);
+        } while (curr != slow);
         prev.next = null;
 
         return head;
     }
 
-    public static void printList(ListNode head) {
+    // print the list
+    public static void print(ListNode head) {
         ListNode curr = head;
         while (curr != null) {
             System.out.print(curr.val);
-            if (curr.next != null) {
-                System.out.print(" -> ");
-            }
+            if (curr.next != null) System.out.print(" -> ");
             curr = curr.next;
         }
         System.out.println();
@@ -148,25 +140,16 @@ public class linkedlist {
         head = addLast(head, 1);
         head = addLast(head, 2);
         head = addLast(head, 3);
-        head = addLast(head, 4);
-        head = addLast(head, 5);
+        head = addLast(head, 2);
+        head = addLast(head, 1);
 
-        System.out.print("Original list: ");
-        printList(head);
+        System.out.print("Original: ");
+        print(head);
 
-        head = reverseList(head);
+        System.out.println("Palindrome: " + isPalindrome(head));
 
-        System.out.print("Reversed list: ");
-        printList(head);
-    }
-
-    public static class ListNode {
-        int val;
-        ListNode next;
-
-        ListNode(int val) {
-            this.val = val;
-            this.next = null;
-        }
+        head = reverse(head);
+        System.out.print("Reversed: ");
+        print(head);
     }
 }
