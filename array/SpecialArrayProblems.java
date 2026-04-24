@@ -1,10 +1,10 @@
-
 import java.util.*;
 import java.util.logging.Logger;
 
+// Rotated / Special Array Problems
 public class ArrayList {
 
-    private static final Logger logger = Logger.getLogger(ArrayList.class.getName());
+    private static final Logger logger = Logger.getLogger(SpecialArrayProblems.class.getName());
 
     // monotonic array
     public static boolean isMonotonic(int[] arr) {
