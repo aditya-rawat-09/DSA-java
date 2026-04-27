@@ -23,7 +23,24 @@ public  class Stacks {
     }
 
 
-  
+    // Q.3 sort a stack
+    public static void sortStack(Stack<Integer> s) {
+        if (s.isEmpty()) return;
+        int top = s.pop();
+        sortStack(s);
+        insertSorted(s, top);
+    }
+
+    private static void insertSorted(Stack<Integer> s, int data) {
+        if (s.isEmpty() || s.peek() <= data) {
+            s.push(data);
+            return;
+        }
+        int top = s.pop();
+        insertSorted(s, data);
+        s.push(top);
+    }
+
     // Q.4 next greater element
     public static int[] nextGreaterElement(int[] arr) {
         int[] nge = new int[arr.length];
@@ -58,10 +75,23 @@ public  class Stacks {
         Stack<Integer> s2 = new Stack<>();
         s2.push(1);
         s2.push(2);
-        s2.push(3); 
+        s2.push(3);
         reverseStack(s2);
         while (!s2.isEmpty()) {
             System.out.println(s2.pop());
         }
+
+        Stack<Integer> s3 = new Stack<>();
+        s3.push(3); s3.push(1); s3.push(4); s3.push(2);
+        sortStack(s3);
+        System.out.print("Sorted Stack: ");
+        while (!s3.isEmpty()) System.out.print(s3.pop() + " ");
+        System.out.println();
+
+        int[] arr = {4, 5, 2, 10, 8};
+        int[] nge = nextGreaterElement(arr);
+        System.out.print("Next Greater Elements: ");
+        for (int x : nge) System.out.print(x + " ");
+        System.out.println();
     }
 }

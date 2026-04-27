@@ -99,6 +99,34 @@ public class mediumstack {
         return isPalindrome;
     }
 
+    //Q.6 decode a string
+    public static String decodeString(String s) {
+        Stack<Integer> intStack = new Stack<>();
+        Stack<StringBuilder> stringStack = new Stack<>();
+        StringBuilder temp= new StringBuilder();
+        int num = 0;
+        for (char c : s.toCharArray()) {
+            if (Character.isDigit(c)) {
+                num = num * 10 + (c - '0');
+            } else if (c == '[') {
+                intStack.push(num);
+                stringStack.push(temp);
+                temp = new StringBuilder();
+                num = 0;
+            } else if (c == ']') {
+                StringBuilder decodedString = stringStack.pop();
+                int repeatTimes = intStack.pop();
+                for (int i = 0; i < repeatTimes; i++) {
+                    decodedString.append(temp);
+                }
+                temp = decodedString;
+            } else {
+                temp.append(c);
+            }
+        }
+        return temp.toString();
+    }
+
     public static void main(String[] args) {
         String s = "({[]})";
         System.out.println(isValidParentheses(s));

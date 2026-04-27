@@ -65,6 +65,15 @@ public class Array2D {
         if (firstColZero) for (int i = 0; i < m; i++) matrix[i][0] = 0;
     }
 
+    // ─── TRANSPOSE OF MATRIX ─────────────────────────────────────────────────────
+    // Flip matrix along its diagonal — in-place
+    // TC: O(n²), SC: O(1)
+    public static void transpose(int[][] matrix) {
+        int n = matrix.length;
+        for (int i = 0; i < n; i++)
+            for (int j = i + 1; j < n; j++) { int tmp = matrix[i][j]; matrix[i][j] = matrix[j][i]; matrix[j][i] = tmp; }
+    }
+
     // ─── SEARCH IN ROW-COL SORTED MATRIX ────────────────────────────────────────
     // Each row and column is sorted — start from top-right corner
     // TC: O(m+n), SC: O(1)
@@ -128,6 +137,11 @@ public class Array2D {
         int[][] m2 = {{1,2,3},{4,5,6},{7,8,9}};
         rotate90(m2);
         logger.info("Rotated: " + Arrays.deepToString(m2));  // [[7,4,1],[8,5,2],[9,6,3]]
+
+        // Transpose
+        int[][] m3 = {{1,2,3},{4,5,6},{7,8,9}};
+        transpose(m3);
+        logger.info("Transposed: " + Arrays.deepToString(m3));  // [[1,4,7],[2,5,8],[3,6,9]]
 
         // Search
         logger.info("Found 5: " + searchMatrix(matrix, 5));  // true
