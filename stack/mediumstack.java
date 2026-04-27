@@ -1,4 +1,11 @@
 import java.util.*;
+
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode(int val) { this.val = val; }
+}
+
 public class mediumstack {
     // Q.1 valid parentheses
     public static boolean isValidParentheses(String s) {
@@ -73,6 +80,25 @@ public class mediumstack {
         return maxArea;
     }
 
+    //Q.5 palindrome linked list
+    public static boolean isPalindrome(ListNode head) {
+        boolean isPalindrome = true;
+        Stack<ListNode> stack = new Stack<>();
+        ListNode slow = head;
+        while(slow!=null){
+            stack.push(slow);
+            slow = slow.next;
+        }
+        while(head!=null){
+            if(head.val!=stack.pop().val){
+                isPalindrome = false;
+                break;
+            }
+            head = head.next;
+        }
+        return isPalindrome;
+    }
+
     public static void main(String[] args) {
         String s = "({[]})";
         System.out.println(isValidParentheses(s));
@@ -90,5 +116,12 @@ public class mediumstack {
 
          int[] heights = {2, 1, 5, 6, 2, 3};
          System.out.println("Largest Rectangle Area: " + largestRectangleArea(heights));
+
+            ListNode head = new ListNode(1);
+            head.next = new ListNode(2);
+            head.next.next = new ListNode(2);   
+            head.next.next.next = new ListNode(1);
+            System.out.println("Is Palindrome: " + isPalindrome(head));
         }
 }
+

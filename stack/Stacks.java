@@ -1,6 +1,6 @@
 import java.util.*;
 public  class Stacks {
-    //push at bottom of stack
+   //  Q.1 push at bottom of stack
     public static void pushAtBottom(Stack<Integer> s, int data) {
         if (s.isEmpty()) {
             s.push(data);
@@ -12,7 +12,7 @@ public  class Stacks {
     }
 
 
-    //reverse a stack
+    // Q.2 reverse a stack
     public static void reverseStack(Stack<Integer> s) {
         if (s.isEmpty()) {
             return;
@@ -23,23 +23,27 @@ public  class Stacks {
     }
 
 
-    //stock span problem
-    public static int[] stockSpan(int[] arr) {
-        int[] span = new int[arr.length];
+  
+    // Q.4 next greater element
+    public static int[] nextGreaterElement(int[] arr) {
+        int[] nge = new int[arr.length];
         Stack<Integer> s = new Stack<>();
-        for (int i = 0; i < arr.length; i++) {
-            while (!s.isEmpty() && arr[s.peek()] <= arr[i]) {
+        for (int i = arr.length - 1; i >= 0; i--) {
+            while (!s.isEmpty() && s.peek() <= arr[i]) {
                 s.pop();
             }
             if (s.isEmpty()) {
-                span[i] = i + 1;
+                nge[i] = -1;
             } else {
-                span[i] = i - s.peek();
+                nge[i] = s.peek();
             }
-            s.push(i);
+            s.push(arr[i]);
         }
-        return span;
+        return nge;
     }
+
+
+
     
     public static void main(String[] args) {
         Stack<Integer> s = new Stack<>();
@@ -58,12 +62,6 @@ public  class Stacks {
         reverseStack(s2);
         while (!s2.isEmpty()) {
             System.out.println(s2.pop());
-        }
-        int[] arr = {100, 80, 60, 70, 60, 75, 85};
-        int[] span = stockSpan(arr);
-        System.out.println("Stock Span:");
-        for (int i = 0; i < span.length; i++) {
-            System.out.print(span[i] + " ");
         }
     }
 }
