@@ -3,7 +3,35 @@ import java.util.*;
 // Rotated / Special Array Problems
 public class SpecialArrayProblems {
 
-    // monotonic array
+    // ─── FOUR SUM ───────────────────────────────────────────────────────────────
+    // Find all unique quadruplets that sum to target
+    // Sort + fix two elements + two pointers
+    // TC: O(n³), SC: O(1)
+    public static List<List<Integer>> fourSum(int[] nums, int target) {
+        Arrays.sort(nums);
+        List<List<Integer>> result = new ArrayList<>();
+        int n = nums.length;
+        for (int i = 0; i < n - 3; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) continue; // skip duplicates
+            for (int j = i + 1; j < n - 2; j++) {
+                if (j > i + 1 && nums[j] == nums[j - 1]) continue; // skip duplicates
+                int left = j + 1, right = n - 1;
+                while (left < right) {
+                    long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];
+                    if (sum == target) {
+                        result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));
+                        while (left < right && nums[left] == nums[left + 1]) left++;    // skip duplicates
+                        while (left < right && nums[right] == nums[right - 1]) right--; // skip duplicates
+                        left++; right--;
+                    } else if (sum < target) left++;
+                    else right--;
+                }
+            }
+        }
+        return result;
+    }
+
+    // ─── MONOTONIC ARRAY ───────────────────────────────────────────────────────────────
     public static boolean isMonotonic(int[] arr) {
         if (arr == null || arr.length == 0) return true;
         boolean increasing = true, decreasing = true;
@@ -59,6 +87,9 @@ public class SpecialArrayProblems {
     }
 
     public static void main(String[] args) {
+        // Four Sum
+        System.out.println(fourSum(new int[]{1, 0, -1, 0, -2, 2}, 0)); // [[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]
+
         System.out.println(Arrays.toString(beautifulArray(5)));
     }
 }

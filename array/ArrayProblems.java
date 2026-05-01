@@ -16,6 +16,30 @@ public class ArrayProblems {
         return new int[]{-1, -1};
     }
 
+    // ─── THREE SUM ───────────────────────────────────────────────────────────────
+    // Find all unique triplets that sum to zero
+    // Sort + two pointers
+    // TC: O(n²), SC: O(1)
+    public static List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> result = new ArrayList<>();
+        for (int i = 0; i < nums.length - 2; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) continue; // skip duplicates
+            int left = i + 1, right = nums.length - 1;
+            while (left < right) {
+                int sum = nums[i] + nums[left] + nums[right];
+                if (sum == 0) {
+                    result.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                    while (left < right && nums[left] == nums[left + 1]) left++;   // skip duplicates
+                    while (left < right && nums[right] == nums[right - 1]) right--; // skip duplicates
+                    left++; right--;
+                } else if (sum < 0) left++;
+                else right--;
+            }
+        }
+        return result;
+    }
+
     // ─── KADANE'S ALGORITHM ─────────────────────────────────────────────────────
     // Maximum subarray sum
     // TC: O(n), SC: O(1)
@@ -194,6 +218,9 @@ public class ArrayProblems {
     public static void main(String[] args) {
         // Two Sum
         System.out.println(Arrays.toString(twoSum(new int[]{2, 7, 11, 15}, 9)));   // [0, 1]
+
+        // Three Sum
+        System.out.println(threeSum(new int[]{-1, 0, 1, 2, -1, -4}));  // [[-1,-1,2],[-1,0,1]]
 
         // Kadane's
         System.out.println(maxSubarraySum(new int[]{-2, 1, -3, 4, -1, 2, 1, -5, 4})); // 6
