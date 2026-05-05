@@ -124,6 +124,32 @@ public class linkedlist {
         return head;
     }
 
+    // rotate linked list to the right by k places
+    // idea: find length → make it circular → break at (len - k % len - 1)
+    // TC: O(n), SC: O(1)
+    public static ListNode rotateByK(ListNode head, int k) {
+        if (head == null || head.next == null || k == 0) return head;
+
+        // find length and tail
+        int len = 1;
+        ListNode tail = head;
+        while (tail.next != null) { tail = tail.next; len++; }
+
+        k = k % len;
+        if (k == 0) return head;
+
+        // make circular
+        tail.next = head;
+
+        // new tail is at (len - k - 1) steps from head
+        ListNode newTail = head;
+        for (int i = 0; i < len - k - 1; i++) newTail = newTail.next;
+
+        ListNode newHead = newTail.next;
+        newTail.next = null; // break the circle
+        return newHead;
+    }
+
     // print the list
     public static void print(ListNode head) {
         ListNode curr = head;
@@ -151,5 +177,16 @@ public class linkedlist {
         head = reverse(head);
         System.out.print("Reversed: ");
         print(head);
+
+        // rotate by k
+        ListNode head2 = null;
+        head2 = addLast(head2, 1);
+        head2 = addLast(head2, 2);
+        head2 = addLast(head2, 3);
+        head2 = addLast(head2, 4);
+        head2 = addLast(head2, 5);
+        System.out.print("Before rotate: "); print(head2);
+        head2 = rotateByK(head2, 2);
+        System.out.print("After rotate k=2: "); print(head2); // 4 -> 5 -> 1 -> 2 -> 3
     }
 }
