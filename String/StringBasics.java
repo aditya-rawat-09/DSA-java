@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class StringBasics {
 
     // Q.1 check palindrome
@@ -38,6 +40,18 @@ public class StringBasics {
         return sb.length() < s.length() ? sb.toString() : s;
     }
 
+    // Q.4 first non-repeating character in a string
+    // use LinkedHashMap to preserve insertion order
+    // TC: O(n), SC: O(1) — at most 26 keys
+    public static char firstNonRepeating(String s) {
+        Map<Character, Integer> map = new LinkedHashMap<>();
+        for (char c : s.toCharArray())
+            map.put(c, map.getOrDefault(c, 0) + 1);
+        for (Map.Entry<Character, Integer> e : map.entrySet())
+            if (e.getValue() == 1) return e.getKey();
+        return '\0'; // no non-repeating char found
+    }
+
     public static void main(String[] args) {
         // Palindrome
         System.out.println(isPalindrome("racecar"));   // true
@@ -49,5 +63,11 @@ public class StringBasics {
         // Compression
         System.out.println(compress("aaabbc"));  // a3b2c1
         System.out.println(compress("abc"));     // abc (no compression since not shorter)
+
+        // First non-repeating
+        char r1 = firstNonRepeating("aabbcde");
+        char r2 = firstNonRepeating("aabb");
+        System.out.println("First non-repeating (aabbcde): " + (r1 == '\0' ? "none" : r1)); // c
+        System.out.println("First non-repeating (aabb): "    + (r2 == '\0' ? "none" : r2)); // none
     }
 }
