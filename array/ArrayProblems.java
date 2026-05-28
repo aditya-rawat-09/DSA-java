@@ -64,7 +64,7 @@ public class ArrayProblems {
         }
     }
 
-    // ─── BEST TIME TO BUY AND SELL STOCK ────────────────────────────────────────
+    // ─── BEST TIME TO BUY AND SELL STOCK I ──────────────────────────────────────
     // Maximum profit from one transaction
     // TC: O(n), SC: O(1)
     public static int maxProfit(int[] prices) {
@@ -74,6 +74,29 @@ public class ArrayProblems {
             maxProfit = Math.max(maxProfit, price - minPrice);
         }
         return maxProfit;
+    }
+
+    // ─── BEST TIME TO BUY AND SELL STOCK II ─────────────────────────────────────
+    // Unlimited transactions — buy/sell on any day, no overlap
+    // Greedy: add every upward slope (profit whenever price goes up)
+    // TC: O(n), SC: O(1)
+    public static int maxProfitII(int[] prices) {
+        int profit = 0;
+        for (int i = 1; i < prices.length; i++)
+            if (prices[i] > prices[i - 1]) profit += prices[i] - prices[i - 1];
+        return profit;
+    }
+
+    // ─── KTH LARGEST ODD NUMBER IN RANGE [l, r] ─────────────────────────────────
+    // Odd numbers in [l,r]: first odd >= l, then every +2
+    // kth largest = last odd <= r, going back (k-1)*2 steps
+    // TC: O(1), SC: O(1)
+    public static long kthLargestOdd(long l, long r, long k) {
+        long lastOdd = (r % 2 == 0) ? r - 1 : r;  // largest odd <= r
+        long firstOdd = (l % 2 == 0) ? l + 1 : l; // smallest odd >= l
+        long totalOdds = (lastOdd - firstOdd) / 2 + 1;
+        if (k > totalOdds) return -1; // not enough odd numbers
+        return lastOdd - (k - 1) * 2;
     }
 
     // ─── MOVE ZEROES ────────────────────────────────────────────────────────────
@@ -230,8 +253,15 @@ public class ArrayProblems {
         sortColors(colors);
         System.out.println(Arrays.toString(colors));  // [0, 0, 1, 1, 2, 2]
 
-        // Stock profit
+        // Stock I (one transaction)
         System.out.println(maxProfit(new int[]{7, 1, 5, 3, 6, 4}));  // 5
+
+        // Stock II (unlimited transactions)
+        System.out.println(maxProfitII(new int[]{7, 1, 5, 3, 6, 4})); // 7
+
+        // Kth largest odd in range
+        System.out.println(kthLargestOdd(1, 10, 2)); // 7 (odds: 1,3,5,7,9 → 2nd largest = 7)
+        System.out.println(kthLargestOdd(1, 10, 6)); // -1 (only 5 odds)
 
         // Trapping Rain Water
         System.out.println(trap(new int[]{0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}));  // 6
