@@ -52,6 +52,19 @@ public class StringBasics {
         return '\0'; // no non-repeating char found
     }
 
+    // Q.5 max balanced string partition
+    // split string of L/R into max parts where each part has equal L and R
+    // greedy: increment count whenever balance hits 0
+    // TC: O(n), SC: O(1)
+    public static int balancedStringSplit(String s) {
+        int count = 0, balance = 0;
+        for (char c : s.toCharArray()) {
+            balance += (c == 'L') ? 1 : -1;
+            if (balance == 0) count++;
+        }
+        return count;
+    }
+
     public static void main(String[] args) {
         // Palindrome
         System.out.println(isPalindrome("racecar"));   // true
@@ -63,6 +76,10 @@ public class StringBasics {
         // Compression
         System.out.println(compress("aaabbc"));  // a3b2c1
         System.out.println(compress("abc"));     // abc (no compression since not shorter)
+
+        // Balanced string partition
+        System.out.println(balancedStringSplit("RLRRLLRLRL")); // 4
+        System.out.println(balancedStringSplit("RLLLLRRRLR")); // 3
 
         // First non-repeating
         char r1 = firstNonRepeating("aabbcde");
