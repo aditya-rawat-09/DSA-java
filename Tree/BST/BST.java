@@ -113,6 +113,37 @@ public class BST {
         return root;
     }
 
+    // ─── SORTED ARRAY TO BALANCED BST ────────────────────────────────────────────
+    // Pick mid as root, recurse on left and right halves → guarantees balanced tree.
+    // Array must be sorted; if unsorted, sort it first.
+    // TC: O(n), SC: O(log n)
+    public Node sortedArrayToBST(int[] arr, int lo, int hi) {
+        if (lo > hi) return null;
+        int mid    = lo + (hi - lo) / 2;
+        Node node  = new Node(arr[mid]);
+        node.left  = sortedArrayToBST(arr, lo,      mid - 1);
+        node.right = sortedArrayToBST(arr, mid + 1, hi);
+        return node;
+    }
+
+    // ─── UNBALANCED BST TO BALANCED BST ──────────────────────────────────────────
+    // Step 1: collect inorder (sorted) into a list  → O(n)
+    // Step 2: build balanced BST from sorted list   → O(n)
+    // TC: O(n), SC: O(n)
+    public Node balanceBST(Node root) {
+        List<Integer> sorted = new ArrayList<>();
+        collectInorder(root, sorted);
+        int[] arr = sorted.stream().mapToInt(i -> i).toArray();
+        return sortedArrayToBST(arr, 0, arr.length - 1);
+    }
+
+    private void collectInorder(Node node, List<Integer> list) {
+        if (node == null) return;
+        collectInorder(node.left,  list);
+        list.add(node.data);
+        collectInorder(node.right, list);
+    }
+
     public static void main(String[] args) {
         // BST:       5
         //           / \
@@ -154,5 +185,19 @@ public class BST {
         for (int v : new int[]{5, 3, 7, 2, 4, 6, 8}) t3.root = t3.insert(t3.root, v);
         t3.mirror(t3.root);
         t3.inorder(t3.root); System.out.println(); // 8 7 6 5 4 3 2
+
+        // Sorted Array to Balanced BST
+        // Array: [1, 2, 3, 4, 5, 6, 7] → balanced BST with root = 4
+        BST t4 = new BST();
+        int[] sorted = {1, 2, 3, 4, 5, 6, 7};
+        t4.root = t4.sortedArrayToBST(sorted, 0, sorted.length - 1);
+        t4.inorder(t4.root); System.out.println(); // 1 2 3 4 5 6 7
+
+        // Unbalanced BST to Balanced BST
+        // Skewed BST: 1->2->3->4->5->6->7 (inserted in order)
+        BST t5 = new BST();
+        for (int v : new int[]{1, 2, 3, 4, 5, 6, 7}) t5.root = t5.insert(t5.root, v);
+        t5.root = t5.balanceBST(t5.root);
+        t5.inorder(t5.root); System.out.println(); // 1 2 3 4 5 6 7
     }
 }
