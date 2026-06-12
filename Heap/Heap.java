@@ -151,6 +151,125 @@ public class Heap {
         return res;
     }
 
+    // ─── KTH LARGEST ELEMENT IN A STREAM ────────────────────────────────────────
+    // Maintain a min-heap of size k; root is always the kth largest.
+    // On each add: push element, if size > k pop min.
+    // TC: O(n log k), SC: O(k)
+    static class KthLargest {
+        PriorityQueue<Integer> minHeap;
+        int k;
+        KthLargest(int k, int[] nums) {
+            this.k = k;
+            minHeap = new PriorityQueue<>();
+            for (int n : nums) add(n);
+        }
+        public int add(int val) {
+            minHeap.offer(val);
+            if (minHeap.size() > k) minHeap.poll();
+            return minHeap.peek();
+        }
+    }
+
+    // ─── MINIMUM TIME TO FILL N SLOTS ────────────────────────────────────────────
+    // slots[] has positions; pipes[] has [start, end] intervals (1-indexed).
+    // Binary search on answer (time t): check if t units of time can fill all slots.
+    // A pipe [s,e] fills slots from max(s,1) to min(e,n) in 1 unit each.
+    // TC: O(n log n), SC: O(n)
+    public int minTimeFillSlots(int n, int[][] pipes) {
+        int lo = 1, hi = n, ans = n;
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            if (canFill(n, pipes, mid)) { ans = mid; hi = mid - 1; }
+            else lo = mid + 1;
+        }
+        return ans;
+    }
+
+    private boolean canFill(int n, int[][] pipes, int t) {
+        // each pipe covers [start-1 .. end] range; use difference array
+        int[] diff = new int[n + 2];
+        for (int[] p : pipes) {
+            int l = Math.max(p[0], 1), r = Math.min(p[1], n);
+            if (l <= r) { diff[l]++; diff[r + 1]--; }
+        }
+        int filled = 0, slots = 0;
+        for (int i = 1; i <= n; i++) {
+            filled += diff[i];
+            if (filled == 0) slots++; // this slot not covered
+        }
+        return slots == 0;
+    }
+
+    // ─── PATH WITH MINIMUM EFFORT ─────────────────────────────────────────────────
+    // Effort = max absolute difference along a path from (0,0) to (m-1,n-1).
+    // Dijkstra with min-heap: state = [effort, row, col].
+    // TC: O(m*n log(m*n)), SC: O(m*n)
+    public int minimumEffortPath(int[][] heights) {
+        int m = heights.length, n = heights[0].length;
+        int[][] dist = new int[m][n];
+        for (int[] row : dist) Arrays.fill(row, Integer.MAX_VALUE);
+        dist[0][0] = 0;
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[0] - b[0]);
+        pq.offer(new int[]{0, 0, 0}); // {effort, row, col}
+        int[][] dirs = {{0,1},{0,-1},{1,0},{-1,0}};
+        while (!pq.isEmpty()) {
+            int[] cur = pq.poll();
+            int effort = cur[0], r = cur[1], c = cur[2];
+            if (r == m - 1 && c == n - 1) return effort;
+            if (effort > dist[r][c]) continue;
+            for (int[] d : dirs) {
+                int nr = r + d[0], nc = c + d[1];
+                if (nr < 0 || nr >= m || nc < 0 || nc >= n) continue;
+                int newEffort = Math.max(effort, Math.abs(heights[nr][nc] - heights[r][c]));
+                if (newEffort < dist[nr][nc]) {
+                    dist[nr][nc] = newEffort;
+                    pq.offer(new int[]{newEffort, nr, nc});
+                }
+            }
+        }
+        return dist[m - 1][n - 1];
+    }
+
+    // ─── MINIMUM OPERATIONS TO HALVE ARRAY SUM ───────────────────────────────────
+    // Greedy: always halve the largest element.
+    // Use max-heap; keep halving until total sum <= half of original.
+    // TC: O(n log n), SC: O(n)
+    public int minOperationsToHalve(int[] nums) {
+        PriorityQueue<Double> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        double total = 0;
+        for (int n : nums) { total += n; maxHeap.offer((double) n); }
+        double target = total / 2, reduced = 0;
+        int ops = 0;
+        while (reduced < target) {
+            double top = maxHeap.poll() / 2;
+            reduced += top;
+            maxHeap.offer(top);
+            ops++;
+        }
+        return ops;
+    }
+
+    // ─── MERGE K SORTED LINKED LISTS ─────────────────────────────────────────────
+    // Push head of each list into min-heap.
+    // Poll min, append to result, push its next node.
+    // TC: O(N log k) where N = total nodes, SC: O(k)
+    static class ListNode {
+        int val; ListNode next;
+        ListNode(int val) { this.val = val; }
+    }
+
+    public ListNode mergeKLists(ListNode[] lists) {
+        PriorityQueue<ListNode> minHeap = new PriorityQueue<>((a, b) -> a.val - b.val);
+        for (ListNode node : lists) if (node != null) minHeap.offer(node);
+        ListNode dummy = new ListNode(0), cur = dummy;
+        while (!minHeap.isEmpty()) {
+            cur.next = minHeap.poll();
+            cur = cur.next;
+            if (cur.next != null) minHeap.offer(cur.next);
+        }
+        return dummy.next;
+    }
+
     public static void main(String[] args) {
         // ── Insert & Remove ──
         Heap h = new Heap(10);
@@ -186,5 +305,33 @@ public class Heap {
         System.out.println(Arrays.toString(
             h.slidingWindowMax(new int[]{1,3,-1,-3,5,3,6,7}, 3)
         )); // [3, 3, 5, 5, 6, 7]
+
+        // ── Kth Largest in Stream ──
+        KthLargest kl = new KthLargest(3, new int[]{4, 5, 8, 2});
+        System.out.println(kl.add(3));  // 4
+        System.out.println(kl.add(5));  // 5
+        System.out.println(kl.add(10)); // 5
+        System.out.println(kl.add(9));  // 8
+
+        // ── Minimum Time to Fill N Slots ──
+        // n=4 slots, pipes cover different ranges
+        int[][] pipes = {{1,2},{2,4},{3,4}};
+        System.out.println(h.minTimeFillSlots(4, pipes)); // 1
+
+        // ── Path With Minimum Effort ──
+        int[][] heights = {{1,2,2},{3,8,2},{5,3,5}};
+        System.out.println(h.minimumEffortPath(heights)); // 2
+
+        // ── Minimum Operations to Halve Array Sum ──
+        System.out.println(h.minOperationsToHalve(new int[]{5,19,8,1})); // 3
+
+        // ── Merge K Sorted Linked Lists ──
+        // Lists: 1->4->5 , 1->3->4 , 2->6
+        ListNode l1 = new ListNode(1); l1.next = new ListNode(4); l1.next.next = new ListNode(5);
+        ListNode l2 = new ListNode(1); l2.next = new ListNode(3); l2.next.next = new ListNode(4);
+        ListNode l3 = new ListNode(2); l3.next = new ListNode(6);
+        ListNode merged = h.mergeKLists(new ListNode[]{l1, l2, l3});
+        while (merged != null) { System.out.print(merged.val + " "); merged = merged.next; }
+        System.out.println(); // 1 1 2 3 4 4 5 6
     }
 }
