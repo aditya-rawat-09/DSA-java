@@ -2,6 +2,30 @@ import java.util.*;
 
 public class SetQuestions {
 
+    // ─── UNION OF TWO ARRAYS ────────────────────────────────────────────────────
+    // Add both arrays into a HashSet; duplicates auto-removed.
+    // TC: O(m+n), SC: O(m+n)
+    public static List<Integer> union(int[] a, int[] b) {
+        Set<Integer> set = new LinkedHashSet<>();
+        for (int n : a) set.add(n);
+        for (int n : b) set.add(n);
+        return new ArrayList<>(set);
+    }
+
+    // ─── INTERSECTION OF TWO ARRAYS ───────────────────────────────────────────────
+    // Add first array to HashSet; iterate second — add to result if present in set.
+    // TC: O(m+n), SC: O(m)
+    public static List<Integer> intersection(int[] a, int[] b) {
+        Set<Integer> setA  = new HashSet<>();
+        Set<Integer> seen  = new HashSet<>(); // avoid duplicates in result
+        List<Integer> res  = new ArrayList<>();
+        for (int n : a) setA.add(n);
+        for (int n : b) {
+            if (setA.contains(n) && seen.add(n)) res.add(n);
+        }
+        return res;
+    }
+
     // ─── COUNT DISTINCT ELEMENTS ─────────────────────────────────────────────────
     // Add all elements to a HashSet; size = count of distinct elements.
     // TC: O(n), SC: O(n)
@@ -32,6 +56,20 @@ public class SetQuestions {
     }
 
     public static void main(String[] args) {
+        // Union
+        System.out.println("─── Union ───");
+        System.out.println(union(
+            new int[]{1, 2, 3, 4},
+            new int[]{3, 4, 5, 6}
+        )); // [1, 2, 3, 4, 5, 6]
+
+        // Intersection
+        System.out.println("─── Intersection ───");
+        System.out.println(intersection(
+            new int[]{1, 2, 3, 4},
+            new int[]{3, 4, 5, 6}
+        )); // [3, 4]
+
         // Count Distinct
         System.out.println("─── Count Distinct ───");
         System.out.println(countDistinct(new int[]{1, 2, 3, 2, 1, 4})); // 4
