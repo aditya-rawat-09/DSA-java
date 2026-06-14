@@ -30,6 +30,29 @@ public class MapQuestions {
         return true;
     }
 
+    // ─── FIND ITINERARY ───────────────────────────────────────────────────────────
+    // Given a list of airline tickets [from, to], reconstruct the itinerary
+    // starting from "JFK" in lexical order.
+    // Approach: Hierholzer's algorithm (Eulerian path).
+    //   - Build adjacency map: from → min-heap of destinations (lexical order).
+    //   - DFS: always pick the smallest next destination; add to result on backtrack.
+    // TC: O(E log E), SC: O(E)  where E = number of tickets
+    public static List<String> findItinerary(List<List<String>> tickets) {
+        Map<String, PriorityQueue<String>> graph = new HashMap<>();
+        for (List<String> t : tickets)
+            graph.computeIfAbsent(t.get(0), k -> new PriorityQueue<>()).offer(t.get(1));
+        LinkedList<String> result = new LinkedList<>();
+        dfs("JFK", graph, result);
+        return result;
+    }
+
+    private static void dfs(String src, Map<String, PriorityQueue<String>> graph, LinkedList<String> result) {
+        PriorityQueue<String> neighbors = graph.get(src);
+        while (neighbors != null && !neighbors.isEmpty())
+            dfs(neighbors.poll(), graph, result);
+        result.addFirst(src); // add to front after all neighbors visited
+    }
+
     public static void main(String[] args) {
         // Majority Element
         System.out.println("─── Majority Element ───");
@@ -41,5 +64,26 @@ public class MapQuestions {
         System.out.println(isAnagram("anagram", "nagaram")); // true
         System.out.println(isAnagram("rat", "car"));         // false
         System.out.println(isAnagram("listen", "silent"));   // true
+
+        // Find Itinerary
+        System.out.println("─── Find Itinerary ───");
+        // Tickets: JFK->MUC, MUC->LHR, LHR->SFO, SFO->SJC
+        List<List<String>> tickets1 = Arrays.asList(
+            Arrays.asList("MUC", "LHR"),
+            Arrays.asList("JFK", "MUC"),
+            Arrays.asList("SFO", "SJC"),
+            Arrays.asList("LHR", "SFO")
+        );
+        System.out.println(findItinerary(tickets1)); // [JFK, MUC, LHR, SFO, SJC]
+
+        // Tickets with multiple choices — pick lexical order
+        List<List<String>> tickets2 = Arrays.asList(
+            Arrays.asList("JFK", "SFO"),
+            Arrays.asList("JFK", "ATL"),
+            Arrays.asList("SFO", "ATL"),
+            Arrays.asList("ATL", "JFK"),
+            Arrays.asList("ATL", "SFO")
+        );
+        System.out.println(findItinerary(tickets2)); // [JFK, ATL, JFK, SFO, ATL, SFO]
     }
 }
