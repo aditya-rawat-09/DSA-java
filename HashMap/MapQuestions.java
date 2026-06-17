@@ -46,6 +46,24 @@ public class MapQuestions {
         return result;
     }
 
+    // ─── LARGEST SUBARRAY WITH SUM 0 ───────────────────────────────────────────────
+    // prefix sum approach: if prefixSum[i] == prefixSum[j], subarray (i+1..j) sums to 0.
+    // Store first occurrence of each prefix sum in a HashMap.
+    // TC: O(n), SC: O(n)
+    public static int largestSubarraySumZero(int[] arr) {
+        Map<Integer, Integer> firstSeen = new HashMap<>();
+        firstSeen.put(0, -1); // sum 0 seen before index 0
+        int sum = 0, maxLen = 0;
+        for (int i = 0; i < arr.length; i++) {
+            sum += arr[i];
+            if (firstSeen.containsKey(sum))
+                maxLen = Math.max(maxLen, i - firstSeen.get(sum));
+            else
+                firstSeen.put(sum, i); // store first occurrence only
+        }
+        return maxLen;
+    }
+
     private static void dfs(String src, Map<String, PriorityQueue<String>> graph, LinkedList<String> result) {
         PriorityQueue<String> neighbors = graph.get(src);
         while (neighbors != null && !neighbors.isEmpty())
@@ -85,5 +103,11 @@ public class MapQuestions {
             Arrays.asList("ATL", "SFO")
         );
         System.out.println(findItinerary(tickets2)); // [JFK, ATL, JFK, SFO, ATL, SFO]
+
+        // Largest Subarray with Sum 0
+        System.out.println("─── Largest Subarray Sum 0 ───");
+        System.out.println(largestSubarraySumZero(new int[]{15, -2, 2, -8, 1, 7, 10, 23})); // 5
+        System.out.println(largestSubarraySumZero(new int[]{1, 2, 3}));                      // 0
+        System.out.println(largestSubarraySumZero(new int[]{1, -1, 3, -3, 2}));              // 4
     }
 }
