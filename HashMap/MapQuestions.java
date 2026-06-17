@@ -64,6 +64,23 @@ public class MapQuestions {
         return maxLen;
     }
 
+    // ─── SUBARRAY SUM EQUAL TO K ──────────────────────────────────────────────────
+    // Count subarrays whose sum equals k.
+    // prefix sum approach: if prefixSum[j] - prefixSum[i] == k → subarray (i+1..j) = k.
+    // Store frequency of each prefix sum; for each index check if (sum - k) exists.
+    // TC: O(n), SC: O(n)
+    public static int subarraySumK(int[] arr, int k) {
+        Map<Integer, Integer> freq = new HashMap<>();
+        freq.put(0, 1); // empty prefix
+        int sum = 0, count = 0;
+        for (int n : arr) {
+            sum += n;
+            count += freq.getOrDefault(sum - k, 0);
+            freq.put(sum, freq.getOrDefault(sum, 0) + 1);
+        }
+        return count;
+    }
+
     private static void dfs(String src, Map<String, PriorityQueue<String>> graph, LinkedList<String> result) {
         PriorityQueue<String> neighbors = graph.get(src);
         while (neighbors != null && !neighbors.isEmpty())
@@ -109,5 +126,11 @@ public class MapQuestions {
         System.out.println(largestSubarraySumZero(new int[]{15, -2, 2, -8, 1, 7, 10, 23})); // 5
         System.out.println(largestSubarraySumZero(new int[]{1, 2, 3}));                      // 0
         System.out.println(largestSubarraySumZero(new int[]{1, -1, 3, -3, 2}));              // 4
+
+        // Subarray Sum Equal to K
+        System.out.println("─── Subarray Sum Equal to K ───");
+        System.out.println(subarraySumK(new int[]{1, 1, 1}, 2));          // 2
+        System.out.println(subarraySumK(new int[]{1, 2, 3}, 3));          // 2  (3 and 1+2)
+        System.out.println(subarraySumK(new int[]{3, 4, 7, 2, -3, 1, 4, 2}, 7)); // 4
     }
 }
