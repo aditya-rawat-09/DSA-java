@@ -90,6 +90,24 @@ public class EasyQuestions {
         return count;
     }
 
+    // ─── GROUP ANAGRAMS ─────────────────────────────────────────────────────────────
+    // Group words that are anagrams of each other.
+    // Insert each word into trie using its sorted characters as key.
+    // Use HashMap<sortedKey, List<word>> to group; trie validates membership.
+    // TC: O(W * L log L), SC: O(W * L)
+    public static List<List<String>> groupAnagrams(String[] words) {
+        Map<String, List<String>> map = new HashMap<>();
+        Trie trie = new Trie();
+        for (String w : words) {
+            char[] ch = w.toCharArray();
+            Arrays.sort(ch);
+            String key = new String(ch);
+            trie.insert(key);
+            map.computeIfAbsent(key, k -> new ArrayList<>()).add(w);
+        }
+        return new ArrayList<>(map.values());
+    }
+
     public static void main(String[] args) {
         // Prefix Sum in Trie
         System.out.println("─── Prefix Count ───");
@@ -111,5 +129,15 @@ public class EasyQuestions {
         System.out.println(countUniqueStrings(
             new String[]{"a", "b", "a", "c", "b"}
         )); // 3
+
+        // Group Anagrams
+        System.out.println("─── Group Anagrams ───");
+        System.out.println(groupAnagrams(
+            new String[]{"eat", "tea", "tan", "ate", "nat", "bat"}
+        )); // [[eat, tea, ate], [tan, nat], [bat]]
+
+        System.out.println(groupAnagrams(
+            new String[]{"abc", "bca", "cab", "xyz", "zyx"}
+        )); // [[abc, bca, cab], [xyz, zyx]]
     }
 }

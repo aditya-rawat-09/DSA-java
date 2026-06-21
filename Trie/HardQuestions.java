@@ -32,6 +32,33 @@ public class HardQuestions {
         }
     }
 
+    // ─── LONGEST WORD IN DICTIONARY ──────────────────────────────────────────────
+    // Find the longest word buildable one char at a time where every prefix exists.
+    // DFS from root visiting only isEnd nodes; track longest path found.
+    // Tie-break: lexicographically smallest.
+    // TC: O(W*L), SC: O(W*L)
+    public static String longestWordInDictionary(String[] words) {
+        Trie trie = new Trie();
+        for (String w : words) trie.insert(w);
+        String[] result = {""};
+        dfsLongest(trie.root, new StringBuilder(), result);
+        return result[0];
+    }
+
+    private static void dfsLongest(TrieNode node, StringBuilder path, String[] result) {
+        if (path.length() > result[0].length() ||
+           (path.length() == result[0].length() && path.toString().compareTo(result[0]) < 0))
+            result[0] = path.toString();
+        for (int i = 0; i < 26; i++) {
+            TrieNode child = node.children[i];
+            if (child != null && child.isEnd) {
+                path.append((char)('a' + i));
+                dfsLongest(child, path, result);
+                path.deleteCharAt(path.length() - 1);
+            }
+        }
+    }
+
     // ─── LONGEST WORD WITH ALL PREFIXES ──────────────────────────────────────────
     // Find the longest word in the array such that every prefix of that word
     // also exists in the array.
@@ -112,6 +139,15 @@ public class HardQuestions {
     }
 
     public static void main(String[] args) {
+        // Longest Word In Dictionary
+        System.out.println("─── Longest Word In Dictionary ───");
+        System.out.println(longestWordInDictionary(
+            new String[]{"w", "wo", "wor", "worl", "world"}
+        )); // world
+        System.out.println(longestWordInDictionary(
+            new String[]{"a", "banana", "app", "appl", "ap", "apply", "apple"}
+        )); // apple
+
         // Longest Word With All Prefixes
         System.out.println("─── Longest Word With All Prefixes ───");
         System.out.println(longestWordWithAllPrefixes(
