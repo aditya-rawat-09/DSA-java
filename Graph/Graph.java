@@ -113,6 +113,75 @@ public class Graph {
         System.out.println();
     }
 
+    // ─── CYCLE DETECTION (Undirected) ────────────────────────────────────────────
+    // Use DFS — if we visit an already-visited node that isn't the parent, cycle exists.
+    // TC: O(V + E), SC: O(V)
+    public boolean hasCycleUndirected() {
+        Set<Integer> visited = new HashSet<>();
+        for (int node : adjList.keySet())
+            if (!visited.contains(node))
+                if (dfsCycleUndirected(node, -1, visited)) return true;
+        return false;
+    }
+
+    private boolean dfsCycleUndirected(int node, int parent, Set<Integer> visited) {
+        visited.add(node);
+        for (int neighbor : adjList.getOrDefault(node, new ArrayList<>())) {
+            if (!visited.contains(neighbor)) {
+                if (dfsCycleUndirected(neighbor, node, visited)) return true;
+            } else if (neighbor != parent) return true;
+        }
+        return false;
+    }
+
+    // ─── BIPARTITE CHECK ──────────────────────────────────────────────────────────
+    // BFS 2-coloring: assign alternating colors (0/1) to neighbors.
+    // If two adjacent nodes share the same color → not bipartite.
+    // TC: O(V + E), SC: O(V)
+    public boolean isBipartite() {
+        Map<Integer, Integer> color = new HashMap<>();
+        for (int node : adjList.keySet()) {
+            if (color.containsKey(node)) continue;
+            Queue<Integer> queue = new LinkedList<>();
+            queue.offer(node);
+            color.put(node, 0);
+            while (!queue.isEmpty()) {
+                int curr = queue.poll();
+                for (int neighbor : adjList.getOrDefault(curr, new ArrayList<>())) {
+                    if (!color.containsKey(neighbor)) {
+                        color.put(neighbor, 1 - color.get(curr));
+                        queue.offer(neighbor);
+                    } else if (color.get(neighbor).equals(color.get(curr))) return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // ─── CYCLE DETECTION (Directed) ───────────────────────────────────────────────
+    // DFS with a recursion stack — if we revisit a node still in the current path, cycle exists.
+    // TC: O(V + E), SC: O(V)
+    public boolean hasCycleDirected() {
+        Set<Integer> visited = new HashSet<>();
+        Set<Integer> recStack = new HashSet<>();
+        for (int node : adjList.keySet())
+            if (!visited.contains(node))
+                if (dfsCycleDirected(node, visited, recStack)) return true;
+        return false;
+    }
+
+    private boolean dfsCycleDirected(int node, Set<Integer> visited, Set<Integer> recStack) {
+        visited.add(node);
+        recStack.add(node);
+        for (int neighbor : adjList.getOrDefault(node, new ArrayList<>())) {
+            if (!visited.contains(neighbor)) {
+                if (dfsCycleDirected(neighbor, visited, recStack)) return true;
+            } else if (recStack.contains(neighbor)) return true;
+        }
+        recStack.remove(node);
+        return false;
+    }
+
     public static void main(String[] args) {
         // ── Create Graph (undirected) ──
         //   0 -- 1 -- 2
@@ -150,5 +219,48 @@ public class Graph {
         // Component: 0 1
         // Component: 2 3
         // Component: 4
+
+        // ── Cycle Detection (Undirected) ──
+        //   0 -- 1 -- 2 -- 0  (cycle)
+        System.out.println("─── Cycle Detection (Undirected) ───");
+        Graph cg = new Graph();
+        cg.addEdge(0, 1, false);
+        cg.addEdge(1, 2, false);
+        cg.addEdge(2, 0, false);
+        System.out.println("Has cycle: " + cg.hasCycleUndirected()); // true
+
+        Graph acyclic = new Graph();
+        acyclic.addEdge(0, 1, false);
+        acyclic.addEdge(1, 2, false);
+        System.out.println("Has cycle: " + acyclic.hasCycleUndirected()); // false
+
+        // ── Bipartite Check ──
+        //   0 -- 1 -- 2 -- 3  (bipartite: even/odd coloring)
+        System.out.println("─── Bipartite Check ───");
+        Graph bg = new Graph();
+        bg.addEdge(0, 1, false);
+        bg.addEdge(1, 2, false);
+        bg.addEdge(2, 3, false);
+        System.out.println("Is bipartite: " + bg.isBipartite()); // true
+
+        Graph notBipartite = new Graph();
+        notBipartite.addEdge(0, 1, false);
+        notBipartite.addEdge(1, 2, false);
+        notBipartite.addEdge(2, 0, false); // odd cycle → not bipartite
+        System.out.println("Is bipartite: " + notBipartite.isBipartite()); // false
+
+        // ── Cycle Detection (Directed) ──
+        //   0 → 1 → 2 → 0  (cycle)
+        System.out.println("─── Cycle Detection (Directed) ───");
+        Graph dcg = new Graph();
+        dcg.addEdge(0, 1, true);
+        dcg.addEdge(1, 2, true);
+        dcg.addEdge(2, 0, true);
+        System.out.println("Has cycle: " + dcg.hasCycleDirected()); // true
+
+        Graph dag = new Graph();
+        dag.addEdge(0, 1, true);
+        dag.addEdge(1, 2, true);
+        System.out.println("Has cycle: " + dag.hasCycleDirected()); // false
     }
 }
