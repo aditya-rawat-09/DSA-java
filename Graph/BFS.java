@@ -3,17 +3,18 @@ import java.util.*;
 public class BFS {
 
     // ─── BFS TRAVERSAL ────────────────────────────────────────────────────────────
-    // Level-order traversal; returns nodes in BFS order.
+    // Level-order traversal using a queue.
+    // Visits all nodes at distance 1, then 2, then 3 ...
     // TC: O(V + E), SC: O(V)
-    public List<Integer> bfsTraversal(Map<Integer, List<Integer>> graph, int src) {
-        List<Integer> result = new ArrayList<>();
+    public void bfs(Map<Integer, List<Integer>> graph, int src) {
         Set<Integer> visited = new HashSet<>();
         Queue<Integer> queue = new LinkedList<>();
         queue.offer(src);
         visited.add(src);
+        System.out.print("BFS: ");
         while (!queue.isEmpty()) {
             int node = queue.poll();
-            result.add(node);
+            System.out.print(node + " ");
             for (int neighbor : graph.getOrDefault(node, new ArrayList<>())) {
                 if (!visited.contains(neighbor)) {
                     visited.add(neighbor);
@@ -21,12 +22,12 @@ public class BFS {
                 }
             }
         }
-        return result;
+        System.out.println();
     }
 
-    // ─── SHORTEST PATH (BFS) ──────────────────────────────────────────────────────
-    // Returns shortest distance from src to target in an unweighted graph.
-    // BFS guarantees shortest path in unweighted graphs.
+    // ─── SHORTEST PATH (Unweighted Graph) ────────────────────────────────────────
+    // BFS guarantees shortest path in unweighted graphs (each edge = weight 1).
+    // Returns -1 if target is not reachable.
     // TC: O(V + E), SC: O(V)
     public int shortestPath(Map<Integer, List<Integer>> graph, int src, int target) {
         if (src == target) return 0;
@@ -49,7 +50,7 @@ public class BFS {
                 }
             }
         }
-        return -1; // not reachable
+        return -1;
     }
 
     public static void main(String[] args) {
@@ -64,10 +65,12 @@ public class BFS {
         graph.put(4, Arrays.asList(3));
 
         BFS bfs = new BFS();
+        System.out.println("─── BFS Traversal ───");
+        bfs.bfs(graph, 0);                                        // BFS: 0 1 2 3 4
 
-        System.out.println("BFS from 0: " + bfs.bfsTraversal(graph, 0)); // [0, 1, 2, 3, 4]
-        System.out.println("Shortest path 0->4: " + bfs.shortestPath(graph, 0, 4)); // 3
-        System.out.println("Shortest path 0->2: " + bfs.shortestPath(graph, 0, 2)); // 2
-        System.out.println("Shortest path 0->9: " + bfs.shortestPath(graph, 0, 9)); // -1
+        System.out.println("─── Shortest Path ───");
+        System.out.println("0 -> 4: " + bfs.shortestPath(graph, 0, 4)); // 3
+        System.out.println("0 -> 2: " + bfs.shortestPath(graph, 0, 2)); // 2
+        System.out.println("0 -> 9: " + bfs.shortestPath(graph, 0, 9)); // -1
     }
 }
