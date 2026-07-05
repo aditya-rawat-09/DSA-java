@@ -7,11 +7,18 @@ public class Graph {
     // Supports both directed and undirected graphs.
     // TC: O(1) per addEdge, SC: O(V + E)
     Map<Integer, List<Integer>> adjList = new HashMap<>();
+    Map<Integer, List<int[]>> weightedAdj = new HashMap<>(); // int[] = {neighbor, weight}
 
     public void addEdge(int u, int v, boolean directed) {
         adjList.computeIfAbsent(u, k -> new ArrayList<>()).add(v);
         if (!directed)
             adjList.computeIfAbsent(v, k -> new ArrayList<>()).add(u);
+    }
+
+    public void addWeightedEdge(int u, int v, int w, boolean directed) {
+        weightedAdj.computeIfAbsent(u, k -> new ArrayList<>()).add(new int[]{v, w});
+        if (!directed)
+            weightedAdj.computeIfAbsent(v, k -> new ArrayList<>()).add(new int[]{u, w});
     }
 
     public void display() {
@@ -232,6 +239,67 @@ public class Graph {
         return result; // size < V means cycle exists
     }
 
+    // ─── DIJKSTRA'S SHORTEST PATH ─────────────────────────────────────────────────
+    // Greedy: always expand the unvisited node with smallest known distance.
+    // Uses a min-heap (PriorityQueue). Does NOT work with negative weights.
+    // TC: O((V + E) log V), SC: O(V)
+    public Map<Integer, Integer> dijkstra(int src) {
+        Map<Integer, Integer> dist = new HashMap<>();
+        for (int node : weightedAdj.keySet()) dist.put(node, Integer.MAX_VALUE);
+        dist.put(src, 0);
+
+        // PQ: {distance, node}
+        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
+        pq.offer(new int[]{0, src});
+
+        while (!pq.isEmpty()) {
+            int[] curr = pq.poll();
+            int d = curr[0], node = curr[1];
+            if (d > dist.getOrDefault(node, Integer.MAX_VALUE)) continue; // stale entry
+            for (int[] edge : weightedAdj.getOrDefault(node, new ArrayList<>())) {
+                int neighbor = edge[0], weight = edge[1];
+                int newDist = dist.get(node) + weight;
+                if (newDist < dist.getOrDefault(neighbor, Integer.MAX_VALUE)) {
+                    dist.put(neighbor, newDist);
+                    pq.offer(new int[]{newDist, neighbor});
+                }
+            }
+        }
+        return dist;
+    }
+
+    // ─── BELLMAN-FORD SHORTEST PATH ───────────────────────────────────────────────
+    // Relax all edges V-1 times. Works with negative weights.
+    // Detects negative weight cycles on the V-th relaxation.
+    // TC: O(V * E), SC: O(V)
+    public Map<Integer, Integer> bellmanFord(int src, int V) {
+        Map<Integer, Integer> dist = new HashMap<>();
+        for (int node : weightedAdj.keySet()) dist.put(node, Integer.MAX_VALUE);
+        dist.put(src, 0);
+
+        // Collect all edges
+        List<int[]> edges = new ArrayList<>(); // {u, v, w}
+        for (int u : weightedAdj.keySet())
+            for (int[] edge : weightedAdj.get(u))
+                edges.add(new int[]{u, edge[0], edge[1]});
+
+        // Relax V-1 times
+        for (int i = 0; i < V - 1; i++)
+            for (int[] e : edges)
+                if (dist.getOrDefault(e[0], Integer.MAX_VALUE) != Integer.MAX_VALUE)
+                    if (dist.get(e[0]) + e[2] < dist.getOrDefault(e[1], Integer.MAX_VALUE))
+                        dist.put(e[1], dist.get(e[0]) + e[2]);
+
+        // V-th relaxation: detect negative cycle
+        for (int[] e : edges)
+            if (dist.getOrDefault(e[0], Integer.MAX_VALUE) != Integer.MAX_VALUE)
+                if (dist.get(e[0]) + e[2] < dist.getOrDefault(e[1], Integer.MAX_VALUE)) {
+                    System.out.println("Negative weight cycle detected!");
+                    return null;
+                }
+        return dist;
+    }
+
     // ─── ALL PATHS FROM SOURCE TO DESTINATION ────────────────────────────────────
     // DFS backtracking: explore every path, add to result when dest is reached.
     // TC: O(2^V) worst case, SC: O(V)
@@ -363,5 +431,33 @@ public class Graph {
         pg.addEdge(1, 3, true);
         pg.addEdge(2, 3, true);
         System.out.println(pg.allPaths(0, 3)); // [[0,1,3],[0,1,2,3],[0,2,3]]
+
+        // ── Dijkstra ──
+        //   0 —(4)— 1 —(1)— 2
+        //   |               |
+        //  (2)             (5)
+        //   |               |
+        //   3 —(8)——————— 4
+        System.out.println("─── Dijkstra from 0 ───");
+        Graph wg = new Graph();
+        wg.addWeightedEdge(0, 1, 4, false);
+        wg.addWeightedEdge(0, 3, 2, false);
+        wg.addWeightedEdge(1, 2, 1, false);
+        wg.addWeightedEdge(2, 4, 5, false);
+        wg.addWeightedEdge(3, 4, 8, false);
+        System.out.println(wg.dijkstra(0)); // {0=0, 1=4, 2=5, 3=2, 4=10}
+
+        // ── Bellman-Ford ──
+        //   0 →(6) 1 →(5) 3
+        //   0 →(7) 2 →(-3) 3
+        //   1 →(-2) 2
+        System.out.println("─── Bellman-Ford from 0 ───");
+        Graph bg2 = new Graph();
+        bg2.addWeightedEdge(0, 1, 6, true);
+        bg2.addWeightedEdge(0, 2, 7, true);
+        bg2.addWeightedEdge(1, 2, -2, true);
+        bg2.addWeightedEdge(1, 3, 5, true);
+        bg2.addWeightedEdge(2, 3, -3, true);
+        System.out.println(bg2.bellmanFord(0, 4)); // {0=0, 1=6, 2=4, 3=1}
     }
 }
