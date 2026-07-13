@@ -63,6 +63,27 @@ public class ShortestPath {
         return dist;
     }
 
+    // ─── CHEAPEST FLIGHTS WITH K STOPS ─────────────────────────────────────────
+    // Modified Bellman-Ford: relax edges exactly k+1 times (k stops = k+1 edges).
+    // Use a temp copy each iteration to avoid using edges from same round.
+    // TC: O(K * E), SC: O(V)
+    public int cheapestFlights(int n, int[][] flights, int src, int dst, int k) {
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+
+        for (int i = 0; i <= k; i++) {
+            int[] temp = Arrays.copyOf(dist, n);
+            for (int[] f : flights) {
+                int u = f[0], v = f[1], w = f[2];
+                if (dist[u] != Integer.MAX_VALUE && dist[u] + w < temp[v])
+                    temp[v] = dist[u] + w;
+            }
+            dist = temp;
+        }
+        return dist[dst] == Integer.MAX_VALUE ? -1 : dist[dst];
+    }
+
     public static void main(String[] args) {
         ShortestPath sp = new ShortestPath();
 
@@ -92,5 +113,13 @@ public class ShortestPath {
         bg.put(2, Arrays.asList(new int[]{3, -3}));
         bg.put(3, new ArrayList<>());
         System.out.println(sp.bellmanFord(bg, 0, 4)); // {0=0, 1=6, 2=4, 3=1}
+
+        // ── Cheapest Flights with K Stops ──
+        // 4 cities, flights: 0→(100)→1, 1→(100)→2, 0→(500)→2
+        // src=0, dst=2, k=1
+        System.out.println("─── Cheapest Flights (K Stops) ───");
+        int[][] flights = {{0,1,100},{1,2,100},{0,2,500}};
+        System.out.println(sp.cheapestFlights(3, flights, 0, 2, 1)); // 200
+        System.out.println(sp.cheapestFlights(3, flights, 0, 2, 0)); // 500
     }
 }
